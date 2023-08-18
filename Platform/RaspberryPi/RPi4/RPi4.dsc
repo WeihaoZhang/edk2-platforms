@@ -189,6 +189,10 @@
   PciSegmentLib|Silicon/Broadcom/Bcm27xx/Library/Bcm2711PciSegmentLib/PciSegmentLib.inf
 
 [LibraryClasses.common.SEC]
+# Alee
+  # ArmGicArchLib|ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
+  ArmGicArchLib|ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
+  ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   MemoryInitPeiLib|Platform/RaspberryPi/Library/MemoryInitPeiLib/MemoryInitPeiLib.inf
@@ -248,12 +252,12 @@
 ###################################################################################################
 
 [BuildOptions]
-  GCC:*_*_*_CC_FLAGS          = -DRPI_MODEL=4
+  GCC:*_*_*_CC_FLAGS          = -DRPI_MODEL=4 -DSPEC_CPU -DNDEBUG  -DWANT_STDC_PROTO -nostdinc -nostdlib -DUEFI_C_SOURCE
   GCC:*_*_*_PP_FLAGS          = -DRPI_MODEL=4
   GCC:*_*_*_ASLPP_FLAGS       = -DRPI_MODEL=4
   GCC:*_*_*_ASLCC_FLAGS       = -DRPI_MODEL=4
   GCC:*_*_*_VFRPP_FLAGS       = -DRPI_MODEL=4
-  GCC:RELEASE_*_*_CC_FLAGS    = -DMDEPKG_NDEBUG -DNDEBUG
+  GCC:RELEASE_*_*_CC_FLAGS    = -DMDEPKG_NDEBUG -DSPEC_CPU -DNDEBUG  -DWANT_STDC_PROTO -DNDEBUG
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
@@ -396,8 +400,9 @@
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdCoreCount|4
   gArmTokenSpaceGuid.PcdVFPEnabled|1
-
+# Alee: secondary core stack
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
+  gArmPlatformTokenSpaceGuid.PcdCPUCoreSecondaryStackSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
 
@@ -596,7 +601,9 @@
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/PrePi/PeiUniCore.inf {
+  # Alee
+  # ArmPlatformPkg/PrePi/PeiUniCore.inf {
+  ArmPlatformPkg/PrePi/PeiMPCore.inf {
     <LibraryClasses>
       SerialPortLib|Platform/RaspberryPi/Library/DualSerialPortLib/DualSerialPortLib.inf
   }
@@ -768,27 +775,27 @@
   #
   # UEFI application (Shell Embedded Boot Loader)
   #
-  ShellPkg/Application/Shell/Shell.inf {
-    <LibraryClasses>
-      ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
-      NULL|ShellPkg/Library/UefiShellLevel2CommandsLib/UefiShellLevel2CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellLevel1CommandsLib/UefiShellLevel1CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellLevel3CommandsLib/UefiShellLevel3CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellDriver1CommandsLib/UefiShellDriver1CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
-      NULL|ShellPkg/Library/UefiShellAcpiViewCommandLib/UefiShellAcpiViewCommandLib.inf
-      HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
-      PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-      BcfgCommandLib|ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf
+  # ShellPkg/Application/Shell/Shell.inf {
+  #   <LibraryClasses>
+  #     ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
+  #     NULL|ShellPkg/Library/UefiShellLevel2CommandsLib/UefiShellLevel2CommandsLib.inf
+  #     NULL|ShellPkg/Library/UefiShellLevel1CommandsLib/UefiShellLevel1CommandsLib.inf
+  #     NULL|ShellPkg/Library/UefiShellLevel3CommandsLib/UefiShellLevel3CommandsLib.inf
+  #     NULL|ShellPkg/Library/UefiShellDriver1CommandsLib/UefiShellDriver1CommandsLib.inf
+  #     NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
+  #     NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
+  #     NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
+  #     NULL|ShellPkg/Library/UefiShellAcpiViewCommandLib/UefiShellAcpiViewCommandLib.inf
+  #     HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
+  #     PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
+  #     BcfgCommandLib|ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf
 
-    <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
-      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
-      gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
-      gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x200000
-  }
+  #   <PcdsFixedAtBuild>
+  #     gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
+  #     gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+  #     gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
+  #     gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x200000
+  # }
 !if $(INCLUDE_TFTP_COMMAND) == TRUE
   ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf  {
     <PcdsFixedAtBuild>
@@ -803,3 +810,9 @@
       UnitTestPersistenceLib|UnitTestFrameworkPkg/Library/UnitTestPersistenceLibNull/UnitTestPersistenceLibNull.inf
       UnitTestResultReportLib|UnitTestFrameworkPkg/Library/UnitTestResultReportLib/UnitTestResultReportLibConOut.inf
   }
+
+
+  #
+  # UEFI SltFramework application
+  #
+  Platform/RaspberryPi/RPi4/Application/SltFramework/SltFramework.inf

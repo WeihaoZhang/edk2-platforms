@@ -1,0 +1,71 @@
+#/** @file
+#
+#   Copyright 2023 Cix Technology (Shanghai) Co., Ltd. All Rights Reserved. *
+#
+#   SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# **/
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = SltFramework
+  FILE_GUID                      = 6D76F4DC-E4AC-A5DE-AA7C-0B3E7A00C033
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = SltFrameworkMain
+
+[Sources]
+  SltMain.c
+  SltProcessCmd.c
+  SltProcessEfi.c
+  SPECLib/FileRW.c
+  SPECLib/Common.c
+  SPECLib/Malloc.c
+  SPECLib/Copying.c
+  SPECLib/sscanf.c
+  Mcf/mcf.c
+  Mcf/mcfutil.c
+  Mcf/readmin.c
+  Mcf/implicit.c
+  Mcf/pstart.c
+  Mcf/output.c
+  Mcf/treeup.c
+  Mcf/pbla.c
+  Mcf/pflowup.c
+  Mcf/psimplex.c
+  Mcf/pbeampp.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  RaspberryPi.dec
+
+
+[LibraryClasses]
+  BaseLib
+  FileHandleLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiApplicationEntryPoint
+  UefiRuntimeServicesTableLib
+  DxeServicesTableLib
+  PrintLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DevicePathLib
+  DxeServicesLib
+  CacheMaintenanceLib
+
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiLoadFileProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid                       ## SOMETIMES_CONSUMES
+
+################################################################
+#
+# The Build Options, below, are only used when building the C library.
+# DO NOT use them when building your application!
+# Nasty things could happen if you do.
+#
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS    = -fno-builtin -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-format
